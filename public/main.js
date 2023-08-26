@@ -6,7 +6,9 @@ const electronic = document.getElementById('Electronic');
 const food = document.getElementById('Food');
 const skincare = document.getElementById('Skincare');
 
+const list = document.getElementById('list');
 const form = document.getElementById('form');
+
 form.addEventListener('submit', async(e) => {
     e.preventDefault();
 
@@ -18,6 +20,27 @@ form.addEventListener('submit', async(e) => {
     try {
         const response = await axios.post('/index', obj);
         console.log('Data saved!', response.data);
+        
+        electronic.innerHTML="";
+        food.innerHTML="";
+        skincare.innerHTML="";
+        const resp = await axios.get('/index');
+        data = resp.data;
+
+        data.forEach(element => {
+            const li = document.createElement('li');
+            li.classList.add('my-3', 'bg-light');
+            li.innerHTML = `
+            ${element.price} - ${element.name} - ${element.category} <button data-id="${element.id}" class="delete btn btn-danger ml-5">Delete order</button> 
+            `;
+            if(element.category === "Electronic"){
+                electronic.appendChild(li);
+            }else if(element.category === "Food"){
+                food.appendChild(li);
+            }else{
+                skincare.appendChild(li);
+            }
+        });
         form.reset();
     } catch (error) {
         console.log('Error while sending data to backend', error);
@@ -31,7 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     data.forEach(element => {
         const li = document.createElement('li');
-        li.classList.add('my-5');
+        li.classList.add('my-3', 'bg-light');
         li.innerHTML = `
         ${element.price} - ${element.name} - ${element.category} <button data-id="${element.id}" class="delete btn btn-danger ml-5">Delete order</button> 
         `;
@@ -45,7 +68,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 });
 
-const list = document.getElementById('list');
 list.addEventListener('click', async(e) => {
     if (e.target.classList.contains('delete')) {
         const id = e.target.getAttribute('data-id');
